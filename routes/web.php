@@ -17,3 +17,4 @@ Route::get('/', function () {
 
 Route::resource('post', 'PostController');
 Route::resource('post.comment', 'CommentController');
+Route::post('/post/comment/block/{email}' , 'CommentController@block');

@@ -38,8 +38,8 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'title' => 'required',
-            'text' => 'required',
+            'title' => 'required|unique:'.(new Post)->getTable(),
+            'text' => 'required|max:255',
         ]);
         $post = new Post;
         $post->title = $request->title;
@@ -87,15 +87,17 @@ class PostController extends Controller
         $post->save();
         return redirect()->action('PostController@show', $post);
     }
-
-    /**
+    /*
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function destroy($id)
     {
-        //
+        Post::destroy($id);
+
+        return redirect()->action('PostController@index');
     }
 }

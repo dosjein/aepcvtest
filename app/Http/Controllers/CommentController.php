@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Post;
 use App\Comment;
+use App\Blocked;
 
 class CommentController extends Controller
 {
@@ -38,10 +39,13 @@ class CommentController extends Controller
     {
         $post = Post::findOrFail($postId);
 
-        $comment = new Comment;
-        $comment->email = $request->email;
-        $comment->comment = $request->comment;
-        $post->comments()->save($comment);
+        //blocked people does not get explenation
+        if (Blocked::where('email' , $request->email)->count() == 0){
+            $comment = new Comment;
+            $comment->email = $request->email;
+            $comment->comment = $request->comment;
+            $post->comments()->save($comment);
+        }
 
         return redirect()->action('PostController@show', $post);
     }
@@ -89,5 +93,19 @@ class CommentController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function block($email){
+        $allCommentList = Comment::where('email' , $email);
+
+        $blockedModel = new Blocked();
+
+        $blockedModel->email = $email;
+
+        if ($allCommentList->count() > 0){
+            $allCommentList->delete();
+        }
+
+        return redirect()->back();
     }
 }
